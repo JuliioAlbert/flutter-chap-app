@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:practica/helpers/mostrar_alerta.dart';
+import 'package:practica/services/auth_service.dart';
 import 'package:practica/widgets/boton_azul.dart';
 import 'package:practica/widgets/custom_input.dart';
 import 'package:practica/widgets/labels.dart';
 import 'package:practica/widgets/logo.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -13,13 +16,19 @@ class LoginPage extends StatelessWidget {
           child: SingleChildScrollView(
             physics: BouncingScrollPhysics(),
             child: Container(
-              height: MediaQuery.of(context).size.height*0.9,
+              height: MediaQuery.of(context).size.height * 0.9,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Logo(titulo: 'Messenger GEN',),
+                  Logo(
+                    titulo: 'Messenger GEN',
+                  ),
                   _Form(),
-                  Label(ruta: 'registro',titulo: 'No tienes Cuenta',subtitulo: 'Crea una ahora',),
+                  Label(
+                    ruta: 'registro',
+                    titulo: 'No tienes Cuenta',
+                    subtitulo: 'Crea una ahora',
+                  ),
                   Text(
                     'Terminos y Condiciones de Uso',
                     style: TextStyle(fontWeight: FontWeight.w300),
@@ -43,6 +52,7 @@ class __FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context, listen: false);
     return Container(
       margin: EdgeInsets.only(top: 40),
       padding: EdgeInsets.symmetric(horizontal: 40),
@@ -61,11 +71,25 @@ class __FormState extends State<_Form> {
             password: true,
           ),
           BotonAzul(
-            onPress: () {
-              print(correo.text);
-              print(password.text);
-            },
-            titulo: 'Registrar',
+            onPress: authService.autenticando
+                ? null
+                : () async {
+                    FocusScope.of(context).unfocus();
+                    final loginOk = await authService.login(
+                        correo.text.trim(), password.text.trim());
+
+                    if (loginOk) {
+                      //Conectar a Sockets Server
+
+                      //Navegar a otra pantalla
+                      Navigator.pushReplacementNamed(context, 'usuarios');
+                    } else {
+                      //Mostrar una alerta
+                      mostrarAlerta(
+                          context, 'Login Incorrecto', 'Revisar Datos');
+                    }
+                  },
+            titulo: 'Iniciar Sesion',
           )
         ],
       ),

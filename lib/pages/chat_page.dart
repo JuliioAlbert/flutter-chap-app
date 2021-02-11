@@ -123,7 +123,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   }
 
   _handleSubmit(String texto) {
-    if(texto.length >0) return;
+    if(texto.length <0) return;
     print(texto);
     _textController.clear();
     _focosNode.requestFocus();
