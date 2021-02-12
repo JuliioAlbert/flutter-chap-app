@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:practica/helpers/mostrar_alerta.dart';
 import 'package:practica/services/auth_service.dart';
@@ -11,10 +10,7 @@ import 'package:provider/provider.dart';
 
 
 
-
-
-
-class LoginPage extends StatelessWidget {
+class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +25,14 @@ class LoginPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
 
-                Logo( titulo: 'Messenger' ),
+                Logo( titulo: 'Registro' ),
 
                 _Form(),
 
                 Labels( 
-                  ruta: 'register',
-                  titulo: '¿No tienes cuenta?',
-                  subTitulo: 'Crea una ahora!',
+                  ruta: 'login',
+                  titulo: '¿Ya tienes una cuenta?',
+                  subTitulo: 'Ingresa ahora!',
                 ),
 
                 Text('Términos y condiciones de uso', style: TextStyle( fontWeight: FontWeight.w200 ),)
@@ -59,13 +55,14 @@ class _Form extends StatefulWidget {
 
 class __FormState extends State<_Form> {
 
+  final nameCtrl  = TextEditingController();
   final emailCtrl = TextEditingController();
   final passCtrl  = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
 
-    final authService   = Provider.of<AuthService>( context );
+    final authService = Provider.of<AuthService>(context);
     final socketService = Provider.of<SocketService>( context );
 
     return Container(
@@ -74,6 +71,13 @@ class __FormState extends State<_Form> {
        child: Column(
          children: <Widget>[
            
+           CustomInput(
+             icon: Icons.perm_identity,
+             placeholder: 'Nombre',
+             keyboardType: TextInputType.text, 
+             textController: nameCtrl,
+           ),
+
            CustomInput(
              icon: Icons.mail_outline,
              placeholder: 'Correo',
@@ -90,20 +94,19 @@ class __FormState extends State<_Form> {
            
 
            BotonAzul(
-             text: 'Ingrese',
+             text: 'Crear cuenta',
              onPressed: authService.autenticando ? null : () async {
+               print( nameCtrl.text );
+               print( emailCtrl.text );
+               print( passCtrl.text );
+               final registroOk = await authService.register(nameCtrl.text.trim(), emailCtrl.text.trim(), passCtrl.text.trim());
 
-               FocusScope.of(context).unfocus();
-
-               final loginOk = await authService.login( emailCtrl.text.trim(), passCtrl.text.trim() );
-
-                if ( loginOk ) {
-                  socketService.connect();
-                  Navigator.pushReplacementNamed(context, 'usuarios');
-                } else {
-                  // Mostara alerta
-                  mostrarAlerta(context, 'Login incorrecto', 'Revise sus credenciales nuevamente');
-                }
+               if ( registroOk == true ) {
+                socketService.connect();
+                Navigator.pushReplacementNamed(context, 'usuarios');
+               } else {
+                 mostrarAlerta(context, 'Registro incorrecto', registroOk );
+               }
 
              },
            )

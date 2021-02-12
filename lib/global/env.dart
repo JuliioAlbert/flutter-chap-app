@@ -2,8 +2,8 @@ import 'dart:io';
 
 class Env {
   static String apiURL = Platform.isAndroid
-      ? 'http://10.0.2.2:3000/api'
-      : 'http://localhost:3000/api';
+      ? 'https://backend-sockets.herokuapp.com/api'
+      : 'https://backend-sockets.herokuapp.com/api';
   static String socketIO =
-      Platform.isAndroid ? 'http://10.0.2.2:3000' : 'http://localhost:3000';
+      Platform.isAndroid ? 'https://backend-sockets.herokuapp.com' : 'https://backend-sockets.herokuapp.com';
 }
